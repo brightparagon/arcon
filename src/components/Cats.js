@@ -37,7 +37,7 @@ class Cats extends Component {
     this.setState({
       isLoading: true,
     })
-    const breeds = await getCatBreeds(this.state.currentPage)
+    const breeds = await getCatBreeds(this.state.currentPage, 10)
     this.setState({
       breeds,
       isLoading: false,
