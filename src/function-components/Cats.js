@@ -1,21 +1,37 @@
 import '../components/Cats.scss'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useMemo } from 'react'
 
 import LoadingIndicator from './LoadingIndicator'
 import HeaderButtonGroup from './HeaderButtonGroup'
 
-import { getCatBreeds } from '../utils/api'
+import { catApiUrl, catHeaders } from '../utils/api'
 import { useLocalStorage } from '../hooks/useLocalStorage'
+import { useFetch } from '../hooks/useFetch'
 
 const Cats = () => {
-  const [error, setError] = useState(null)
-  const [isLoading, setIsLoading] = useState(false)
   const [time, setTime] = useState(0)
   const [storedBreeds, storeBreeds] = useLocalStorage('breeds', [])
   const [storedPages, storePages] = useLocalStorage('fetchedPages', [])
-  const [breeds, setBreeds] = useState(storedBreeds)
   const [currentPage, setCurrentPage] = useState(storedPages.length !== 0 ? storedPages[storedPages.length - 1] : 1)
+  const params = useMemo(
+    () => ({
+      page: currentPage,
+      limit: 10,
+    }),
+    [currentPage]
+  )
+  const {
+    data: breeds,
+    isLoading,
+    hasError,
+    error,
+  } = useFetch(
+    `${catApiUrl}/breeds`,
+    params,
+    catHeaders,
+    storedBreeds
+  )
 
   const handlePreviousPage = useCallback(() => {
     if (currentPage <= 1) {
@@ -29,38 +45,13 @@ const Cats = () => {
     setCurrentPage(previousPage => previousPage + 1)
   }, [])
 
-  useEffect(() => {
-    const fetchBreeds = async () => {
-      try {
-        setIsLoading(true)
-        const breeds = await getCatBreeds(currentPage, 10)
+  // useEffect(() => {
+  //   if (storedPages.includes(currentPage)) {
+  //     return
+  //   }
 
-        if (breeds.length === 0) {
-          setIsLoading(false)
-          return
-        }
-
-        setBreeds(prevBreeds => {
-          const updatedBreeds = prevBreeds.concat(breeds)
-          storeBreeds(updatedBreeds)
-
-          return updatedBreeds
-        })
-      } catch (error) {
-        console.error(error)
-        setError(error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    if (storedPages.includes(currentPage)) {
-      return
-    }
-
-    storePages(storedPages.concat(currentPage))
-    fetchBreeds()
-  }, [currentPage])
+  //   storePages(storedPages.concat(currentPage))
+  // }, [currentPage])
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -74,7 +65,7 @@ const Cats = () => {
 
   return (
     <div className="Cats">
-      {error === null ? (
+      {!hasError ? (
         <>
           <p>타이머: {time}</p>
           <p>현재 페이지: {currentPage}</p>

@@ -17,3 +17,8 @@ export const getCatBreeds = async (currentPage, limit = 5) => {
 
   return breeds
 }
+
+export const catApiUrl = 'https://api.thecatapi.com/v1'
+export const catHeaders = {
+  'x-api-key': apiKey,
+}
