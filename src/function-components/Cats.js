@@ -6,14 +6,15 @@ import LoadingIndicator from './LoadingIndicator'
 import HeaderButtonGroup from './HeaderButtonGroup'
 
 import { getCatBreeds } from '../utils/api'
-
-const fetchedPages = []
+import { useLocalStorage } from '../hooks/useLocalStorage'
 
 const Cats = () => {
-  const [currentPage, setCurrentPage] = useState(1)
-  const [breeds, setBreeds] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [time, setTime] = useState(0)
+  const [storedBreeds, storeBreeds] = useLocalStorage('breeds', [])
+  const [storedPages, storePages] = useLocalStorage('fetchedPages', [])
+  const [breeds, setBreeds] = useState(storedBreeds)
+  const [currentPage, setCurrentPage] = useState(storedPages.length !== 0 ? storedPages[storedPages.length - 1] : 1)
 
   const handlePreviousPage = useCallback(() => {
     if (currentPage <= 1) {
@@ -37,15 +38,20 @@ const Cats = () => {
         return
       }
 
-      setBreeds((prevBreeds) => prevBreeds.concat(breeds))
+      setBreeds((prevBreeds) => {
+        const updatedBreeds = prevBreeds.concat(breeds)
+        storeBreeds(updatedBreeds)
+
+        return updatedBreeds
+      })
       setIsLoading(false)
     }
 
-    if (fetchedPages.includes(currentPage)) {
+    if (storedPages.includes(currentPage)) {
       return
     }
 
-    fetchedPages.push(currentPage)
+    storePages(storedPages.concat(currentPage))
     fetchBreeds()
   }, [currentPage])
 
