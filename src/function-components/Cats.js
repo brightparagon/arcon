@@ -7,11 +7,12 @@ import HeaderButtonGroup from './HeaderButtonGroup'
 
 import { getCatBreeds } from '../utils/api'
 
+const fetchedPages = []
+
 const Cats = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [breeds, setBreeds] = useState([])
   const [isLoading, setIsLoading] = useState(false)
-  const [counter, setCounter] = useState(0)
 
   const handlePreviousPage = useCallback(() => {
     if (currentPage <= 1) {
@@ -19,7 +20,7 @@ const Cats = () => {
     }
 
     setCurrentPage((previousPage) => previousPage - 1)
-  }, [])
+  }, [currentPage])
 
   const handleNextPage = useCallback(() => {
     setCurrentPage((previousPage) => previousPage + 1)
@@ -40,14 +41,13 @@ const Cats = () => {
       setIsLoading(false)
     }
 
+    if (fetchedPages.includes(currentPage)) {
+      return
+    }
+
+    fetchedPages.push(currentPage)
     fetchBreeds()
   }, [currentPage])
-
-  useEffect(() => {
-    if (counter === 100) {
-      // 무슨 기능 ...
-    }
-  }, [counter])
 
   return (
     <div className="Cats">
