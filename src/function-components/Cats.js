@@ -9,6 +9,7 @@ import { getCatBreeds } from '../utils/api'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 
 const Cats = () => {
+  const [error, setError] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [time, setTime] = useState(0)
   const [storedBreeds, storeBreeds] = useLocalStorage('breeds', [])
@@ -21,30 +22,36 @@ const Cats = () => {
       return
     }
 
-    setCurrentPage((previousPage) => previousPage - 1)
+    setCurrentPage(previousPage => previousPage - 1)
   }, [currentPage])
 
   const handleNextPage = useCallback(() => {
-    setCurrentPage((previousPage) => previousPage + 1)
+    setCurrentPage(previousPage => previousPage + 1)
   }, [])
 
   useEffect(() => {
     const fetchBreeds = async () => {
-      setIsLoading(true)
-      const breeds = await getCatBreeds(currentPage, 10)
+      try {
+        setIsLoading(true)
+        const breeds = await getCatBreeds(currentPage, 10)
 
-      if (breeds.length === 0) {
+        if (breeds.length === 0) {
+          setIsLoading(false)
+          return
+        }
+
+        setBreeds(prevBreeds => {
+          const updatedBreeds = prevBreeds.concat(breeds)
+          storeBreeds(updatedBreeds)
+
+          return updatedBreeds
+        })
+      } catch (error) {
+        console.error(error)
+        setError(error)
+      } finally {
         setIsLoading(false)
-        return
       }
-
-      setBreeds((prevBreeds) => {
-        const updatedBreeds = prevBreeds.concat(breeds)
-        storeBreeds(updatedBreeds)
-
-        return updatedBreeds
-      })
-      setIsLoading(false)
     }
 
     if (storedPages.includes(currentPage)) {
@@ -57,7 +64,7 @@ const Cats = () => {
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setTime((previousTime) => previousTime + 1)
+      setTime(previousTime => previousTime + 1)
     }, 1000)
 
     return () => {
@@ -67,28 +74,38 @@ const Cats = () => {
 
   return (
     <div className="Cats">
-      <p>타이머: {time}</p>
-      <p>현재 페이지: {currentPage}</p>
-      <HeaderButtonGroup onPreviousPage={handlePreviousPage} onNextPage={handleNextPage} />
-      <LoadingIndicator isLoading={isLoading} />
-      <ul>
-        {breeds.map((breed, index) => (
-          <li className="Cat" key={`${breed.id}-${index}`}>
-            <span>Name: {breed.name}</span>
-            <span>Origin: {breed.origin}</span>
-            <span>Description: {breed.description}</span>
-            <span>
-              Wiki:{' '}
-              <a href={breed.wikipedia_url} target="_blank">
-                {breed.wikipedia_url}
-              </a>
-            </span>
-            <img className="Image" src={breed.image ? breed.image.url : null} />
-          </li>
-        ))}
-      </ul>
-      <LoadingIndicator isLoading={isLoading} />
-      <HeaderButtonGroup onPreviousPage={handlePreviousPage} onNextPage={handleNextPage} />
+      {error === null ? (
+        <>
+          <p>타이머: {time}</p>
+          <p>현재 페이지: {currentPage}</p>
+          <HeaderButtonGroup onPreviousPage={handlePreviousPage} onNextPage={handleNextPage} />
+          <LoadingIndicator isLoading={isLoading} />
+          <ul>
+            {breeds.map((breed, index) => (
+              <li className="Cat" key={`${breed.id}-${index}`}>
+                <span>Name: {breed.name}</span>
+                <span>Origin: {breed.origin}</span>
+                <span>Description: {breed.description}</span>
+                <span>
+                  Wiki:{' '}
+                  <a href={breed.wikipedia_url} target="_blank">
+                    {breed.wikipedia_url}
+                  </a>
+                </span>
+                <img className="Image" src={breed.image ? breed.image.url : null} />
+              </li>
+            ))}
+          </ul>
+          <LoadingIndicator isLoading={isLoading} />
+          <HeaderButtonGroup onPreviousPage={handlePreviousPage} onNextPage={handleNextPage} />
+        </>
+      ) : (
+        <p>
+          데이터를 불러오는 도중 에러가 발생했습니다.
+          <br />
+          {JSON.stringify(error, null, 2)}
+        </p>
+      )}
     </div>
   )
 }
