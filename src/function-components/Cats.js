@@ -13,6 +13,7 @@ const Cats = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [breeds, setBreeds] = useState([])
   const [isLoading, setIsLoading] = useState(false)
+  const [time, setTime] = useState(0)
 
   const handlePreviousPage = useCallback(() => {
     if (currentPage <= 1) {
@@ -24,7 +25,6 @@ const Cats = () => {
 
   const handleNextPage = useCallback(() => {
     setCurrentPage((previousPage) => previousPage + 1)
-    setCounter(100)
   }, [])
 
   useEffect(() => {
@@ -49,8 +49,19 @@ const Cats = () => {
     fetchBreeds()
   }, [currentPage])
 
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setTime((previousTime) => previousTime + 1)
+    }, 1000)
+
+    return () => {
+      clearInterval(intervalId)
+    }
+  }, [])
+
   return (
     <div className="Cats">
+      <p>타이머: {time}</p>
       <p>현재 페이지: {currentPage}</p>
       <HeaderButtonGroup onPreviousPage={handlePreviousPage} onNextPage={handleNextPage} />
       <LoadingIndicator isLoading={isLoading} />
