@@ -30,7 +30,19 @@ const Cats = () => {
     `${catApiUrl}/breeds`,
     params,
     catHeaders,
-    storedBreeds
+    storedBreeds,
+    (newData) => {
+      storeBreeds(storedBreeds.concat(newData))
+    },
+    () => {
+      const hasFetched = storedPages.includes(currentPage)
+
+      if (!hasFetched) {
+        storePages(storedPages.concat(currentPage))
+      }
+
+      return !hasFetched
+    }
   )
 
   const handlePreviousPage = useCallback(() => {
@@ -44,14 +56,6 @@ const Cats = () => {
   const handleNextPage = useCallback(() => {
     setCurrentPage(previousPage => previousPage + 1)
   }, [])
-
-  // useEffect(() => {
-  //   if (storedPages.includes(currentPage)) {
-  //     return
-  //   }
-
-  //   storePages(storedPages.concat(currentPage))
-  // }, [currentPage])
 
   useEffect(() => {
     const intervalId = setInterval(() => {

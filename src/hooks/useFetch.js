@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 
 import { getQueryString } from '../utils/misc'
 
-export function useFetch(apiUrl, params, headers, initialData) {
+export function useFetch(apiUrl, params, headers, initialData, storeStorage, getShouldFetch) {
   const [data, setData] = useState(initialData)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -20,6 +20,7 @@ export function useFetch(apiUrl, params, headers, initialData) {
         })
         const data = await response.json()
         setData((previousData => previousData.concat(data)))
+        storeStorage(data)
       } catch (error) {
         console.error(error)
         setError(error)
@@ -28,7 +29,9 @@ export function useFetch(apiUrl, params, headers, initialData) {
       }
     }
 
-    fetchData()
+    if (getShouldFetch()) {
+      fetchData()
+    }
   }, [apiUrl, params, headers])
 
   return {
