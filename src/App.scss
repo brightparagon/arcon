@@ -1,7 +1,14 @@
 .App {
   main {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: center;
+    align-items: center;
+  }
+
+  .Product {
+    display: flex;
+    flex-direction: column;
+    margin: 200px auto;
   }
 }
