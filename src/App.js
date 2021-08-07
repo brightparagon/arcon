@@ -1,8 +1,19 @@
 import './App.scss'
 
+import * as Sentry from '@sentry/react'
+import { Integrations } from '@sentry/tracing'
+
 // import Cats from './components/Cats'
 import Cats from './function-components/Cats'
 import ErrorBoundary from './components/ErrorBoundary'
+
+const sentryDSN = ''
+
+Sentry.init({
+  dsn: sentryDSN,
+  integrations: [new Integrations.BrowserTracing()],
+  tracesSampleRate: 0.1,
+})
 
 function App() {
   const product = {
@@ -16,7 +27,7 @@ function App() {
       <main>
         <Cats />
         <ErrorBoundary errorFallback={ErrorFallback}>
-          <Product  />
+          <Product />
         </ErrorBoundary>
       </main>
     </div>

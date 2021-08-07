@@ -1,4 +1,7 @@
 import { Component } from 'react'
+import * as Sentry from '@sentry/react'
+
+const isProduction = process.env.NODE_ENV === 'production'
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -6,12 +9,16 @@ class ErrorBoundary extends Component {
     this.state = { hasError: false }
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError() {
     return { hasError: true }
   }
 
   componentDidCatch(error, errorInfo) {
     console.log(error, errorInfo)
+
+    if (isProduction) {
+      Sentry.captureException(error, { extra: errorInfo })
+    }
   }
 
   render() {
