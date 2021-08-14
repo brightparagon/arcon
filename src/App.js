@@ -2,10 +2,14 @@ import './App.scss'
 
 import * as Sentry from '@sentry/react'
 import { Integrations } from '@sentry/tracing'
+import { Switch, Route } from 'react-router-dom'
 
 // import Cats from './components/Cats'
 import Cats from './function-components/Cats'
 import ErrorBoundary from './components/ErrorBoundary'
+import Home from './pages/Home'
+import Product from './pages/Product'
+import User from './pages/User'
 
 const sentryDSN = ''
 
@@ -25,10 +29,15 @@ function App() {
   return (
     <div className="App">
       <main>
-        <Cats />
+        {/* <Cats />
         <ErrorBoundary errorFallback={ErrorFallback}>
           <Product />
-        </ErrorBoundary>
+        </ErrorBoundary> */}
+        <Switch>
+          <Route exact path="/" component={Home} />
+          <Route exact path="/product" component={Product} />
+          <Route exact path="/user" component={User} />
+        </Switch>
       </main>
     </div>
   )
@@ -36,15 +45,15 @@ function App() {
 
 export default App
 
-function Product({ product }) {
-  return (
-    <div className="Product">
-      <span>Product: {product.name}</span>
-      <span>Description: {product.description}</span>
-      <span>Price: {product.price}</span>
-    </div>
-  )
-}
+// function Product({ product }) {
+//   return (
+//     <div className="Product">
+//       <span>Product: {product.name}</span>
+//       <span>Description: {product.description}</span>
+//       <span>Price: {product.price}</span>
+//     </div>
+//   )
+// }
 
 function ErrorFallback() {
   return (
