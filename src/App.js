@@ -2,9 +2,8 @@ import './App.scss'
 
 import * as Sentry from '@sentry/react'
 import { Integrations } from '@sentry/tracing'
-import { Switch, Route } from 'react-router-dom'
+import { Switch, Route, Link } from 'react-router-dom'
 
-// import Cats from './components/Cats'
 import Cats from './function-components/Cats'
 import ErrorBoundary from './components/ErrorBoundary'
 import Home from './pages/Home'
@@ -18,6 +17,22 @@ Sentry.init({
   integrations: [new Integrations.BrowserTracing()],
   tracesSampleRate: 0.1,
 })
+
+const Navigation = () => {
+  return (
+    <ul>
+      <li>
+        <Link to="/">Home</Link>
+      </li>
+      <li>
+        <Link to="/product">Product</Link>
+      </li>
+      <li>
+        <Link to="/user">User</Link>
+      </li>
+    </ul>
+  )
+}
 
 function App() {
   const product = {
@@ -33,10 +48,13 @@ function App() {
         <ErrorBoundary errorFallback={ErrorFallback}>
           <Product />
         </ErrorBoundary> */}
+        <Navigation />
         <Switch>
           <Route exact path="/" component={Home} />
-          <Route exact path="/product" component={Product} />
+          <Route path="/product/:productName" component={Product} />
           <Route exact path="/user" component={User} />
+          <Route exact path="/cats" component={Cats} />
+          <Route component={UrlFallback} />
         </Switch>
       </main>
     </div>
@@ -66,6 +84,22 @@ function ErrorFallback() {
         }}
       >
         새로고침
+      </button>
+    </div>
+  )
+}
+
+function UrlFallback() {
+  return (
+    <div>
+      존재하지 않는 페이지 입니다. 404 Not Found
+      <br />
+      <button
+        onClick={() => {
+          // 홈페이지로 이동시키는 react-router-dom 코드
+        }}
+      >
+        홈페이지로 가기
       </button>
     </div>
   )
