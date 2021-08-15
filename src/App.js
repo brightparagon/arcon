@@ -2,7 +2,7 @@ import './App.scss'
 
 import * as Sentry from '@sentry/react'
 import { Integrations } from '@sentry/tracing'
-import { Switch, Route, Link } from 'react-router-dom'
+import { Switch, Route, Link, useHistory } from 'react-router-dom'
 
 import Cats from './function-components/Cats'
 import ErrorBoundary from './components/ErrorBoundary'
@@ -29,6 +29,9 @@ const Navigation = () => {
       </li>
       <li>
         <Link to="/user">User</Link>
+      </li>
+      <li>
+        <Link to="/cats">Cats</Link>
       </li>
     </ul>
   )
@@ -90,16 +93,18 @@ function ErrorFallback() {
 }
 
 function UrlFallback() {
+  const history = useHistory()
+
   return (
     <div>
       존재하지 않는 페이지 입니다. 404 Not Found
       <br />
       <button
         onClick={() => {
-          // 홈페이지로 이동시키는 react-router-dom 코드
+          history.push('/cats')
         }}
       >
-        홈페이지로 가기
+        고양이 페이지로 가기
       </button>
     </div>
   )
