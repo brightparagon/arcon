@@ -9,6 +9,7 @@ import ErrorBoundary from './components/ErrorBoundary'
 import Home from './pages/Home'
 import Product from './pages/Product'
 import User from './pages/User'
+import Form from './pages/Form'
 
 const sentryDSN = ''
 
@@ -32,6 +33,9 @@ const Navigation = () => {
       </li>
       <li>
         <Link to="/cats">Cats</Link>
+      </li>
+      <li>
+        <Link to="/form">Form</Link>
       </li>
     </ul>
   )
@@ -57,6 +61,7 @@ function App() {
           <Route path="/product/:productName" component={Product} />
           <Route exact path="/user" component={User} />
           <Route exact path="/cats" component={Cats} />
+          <Route exact path="/form" component={Form} />
           <Route component={UrlFallback} />
         </Switch>
       </main>
